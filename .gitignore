@@ -38,3 +38,6 @@ DerivedData/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/xcode
+DerivedData/HWS-WordScramble/Build/Intermediates.noindex/XCBuildData/BuildDescriptionCacheIndex-fec2d25ecbbd6b776147c5df8756c4fe
+DerivedData/HWS-WordScramble/Logs/Build/LogStoreManifest.plist
+DerivedData/HWS-WordScramble/Logs/Issues/LogStoreManifest.plist
