@@ -30,12 +30,27 @@ struct ContentView: View {
             }
             .navigationBarTitle(rootWord)
             .onAppear(perform: startGame)
+            .alert(isPresented: $showingError, content: {
+                Alert(title:Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            })
         }
     }
     
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard answer.count > 0 else {
+            return
+        }
+        guard isOriginal(word: answer) else {
+            wordError(title: "Duplicate word", msg: "use original word")
+            return
+        }
+        guard isPossible(word: answer) else {
+            wordError(title: "unrecognised word", msg: "You cant make random words. Try making word from the provided word letters")
+            return
+        }
+        guard isReal(word: answer) else {
+            wordError(title: "Word not possible", msg: "The word you created is not in the English language. Try Klingon")
             return
         }
         usedWords.insert(answer, at: 0)
@@ -58,6 +73,7 @@ struct ContentView: View {
     }
     
     func isPossible(word: String) -> Bool {
+        
         var tempWord = rootWord
         for letter in word {
             if let position = tempWord.firstIndex(of: letter) {
@@ -70,15 +86,19 @@ struct ContentView: View {
     }
     
     func isReal(word: String) -> Bool {
+        
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
-        
     }
     
-    
+    func wordError(title: String, msg: String) {
+        errorTitle = title
+        errorMessage = msg
+        showingError = true
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
