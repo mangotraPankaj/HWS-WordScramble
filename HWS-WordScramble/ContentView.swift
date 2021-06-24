@@ -69,7 +69,8 @@ struct ContentView: View {
     }
     
     func isOriginal(word: String) -> Bool {
-        !usedWords.contains(word)
+        if(usedWords.contains(word) || (word == rootWord)) { return false }
+        else {return true}
     }
     
     func isPossible(word: String) -> Bool {
@@ -87,11 +88,15 @@ struct ContentView: View {
     
     func isReal(word: String) -> Bool {
         
+        if(word.utf16.count < 3) {
+            return false
+        } else {
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+        }
     }
     
     func wordError(title: String, msg: String) {
