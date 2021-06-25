@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+class FinalScore: ObservableObject {
+    @Published var score: Int = 0
+    
+    func addScore(from word: String) {
+        score = score + word.count * 10
+    }
+}
+
 struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
@@ -14,6 +22,7 @@ struct ContentView: View {
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
+    @ObservedObject var finalScore = FinalScore()
     
     var body: some View {
         NavigationView {
@@ -27,8 +36,12 @@ struct ContentView: View {
                     Image(systemName: "\($0.count).circle")
                     Text($0)
                 }
+                
+                Text("Your score is: \(finalScore.score)")
             }
             .navigationBarTitle(rootWord)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("🔄", action: startGame))
             .onAppear(perform: startGame)
             .alert(isPresented: $showingError, content: {
                 Alert(title:Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("OK")))
@@ -55,6 +68,7 @@ struct ContentView: View {
         }
         usedWords.insert(answer, at: 0)
         newWord = ""
+        finalScore.addScore(from: answer)
     }
     
     func startGame() {
@@ -65,12 +79,14 @@ struct ContentView: View {
         
         let allWords = startWords.components(separatedBy: "\n")
         rootWord = allWords.randomElement() ?? "silkWorm"
+        finalScore.score = 0
+        usedWords = []
         return
     }
     
     func isOriginal(word: String) -> Bool {
         if(usedWords.contains(word) || (word == rootWord)) { return false }
-        else {return true}
+        else { return true }
     }
     
     func isPossible(word: String) -> Bool {
@@ -91,11 +107,11 @@ struct ContentView: View {
         if(word.utf16.count < 3) {
             return false
         } else {
-        let checker = UITextChecker()
-        let range = NSRange(location: 0, length: word.utf16.count)
-        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-        
-        return misspelledRange.location == NSNotFound
+            let checker = UITextChecker()
+            let range = NSRange(location: 0, length: word.utf16.count)
+            let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+            
+            return misspelledRange.location == NSNotFound
         }
     }
     
